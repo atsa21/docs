@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './pages/auth/auth.component';
-import { MainComponent } from './pages/main/main.component';
+import { appRouts } from '@core/constants';
+import { authRoutes } from './pages/auth/auth.routes';
+import { mainRoutes } from './pages/main/main.routes';
+import { SessionGuard } from '@core/guards';
 
 export const routes: Routes = [
-  { path: '', component: AuthComponent },
-  { path: 'home', component: MainComponent },
+  ...authRoutes,
+  ...mainRoutes,
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: appRouts.main.routerPath,
   },
 ];

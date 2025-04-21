@@ -1,1 +1,30 @@
-<p>login works!</p>
+<div>
+  <div>
+    <h1>Login</h1>
+  </div>
+
+  <form [formGroup]="loginForm">
+    <mat-form-field appearance="outline" color="primary" floatLabel="always">
+        <mat-label>Email</mat-label>
+        <input formControlName="email" matInput placeholder="example@gmail.com" required>
+        @if (email?.errors?.['required']) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (email?.errors?.['email']) {
+          <mat-error>Please enter a correct email format</mat-error>
+        }  
+    </mat-form-field>
+    <mat-form-field appearance="outline" color="primary" floatLabel="always">
+        <mat-label>Password</mat-label>
+        <input formControlName="password" [type]="hide ? 'password' : 'text'" matInput placeholder="enter your password" required>
+        <button mat-icon-button matSuffix type="button" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" (click)="hide = !hide">
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+
+        @if (password?.errors?.['required']) {
+          <mat-error>Password is required</mat-error>
+        }
+    </mat-form-field>
+    <button [disabled]="!loginForm.valid" mat-flat-button (click)="login()">Login</button>
+  </form>
+</div>
