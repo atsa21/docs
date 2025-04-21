@@ -8,8 +8,8 @@ export const authRoutes: Routes = [
     path: appRouts.auth.routerPath,
     component: AuthComponent,
     children: [
-      { path:
-        appRouts.login.routerPath,
+      { 
+        path: appRouts.login.routerPath,
         component: LoginComponent,
       },
       {

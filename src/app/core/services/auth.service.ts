@@ -8,6 +8,6 @@ import { LoginModel, LoginSuccessModel } from '@core/models';
 })
 export class AuthService extends AbstractHttp {
   public login(payload: LoginModel): Observable<LoginSuccessModel> {
-    return this.httpPostRequest('api/v1/auth/login', payload);
+    return this.httpPostRequest('api/v1/auth/login', payload, { noHeaders: true });
   }
 }

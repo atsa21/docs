@@ -15,14 +15,9 @@ export class SessionGuard implements CanActivate {
     private router: Router,
   ) {}
 
-  canActivate(): boolean | Observable<boolean> {
+  canActivate(): Observable<boolean> {
     return this.userService.getUser().pipe(
       take(1),
-      map((user) => !!user),
-      catchError(() => {
-        this.router.navigate([appRouts.login.routerPath]);
-        return of(false);
-      })
-    );
+      map((user) => !!user));
   }
 }

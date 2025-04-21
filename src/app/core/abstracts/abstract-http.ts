@@ -3,20 +3,26 @@ import { inject } from '@angular/core';
 import { Params } from '@angular/router';
 import { ELocalStoragesKeys } from '@core/enums';
 import { LocalStorageService } from '@core/services';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 export class AbstractHttp {
   protected http = inject(HttpClient);
-  protected cookieService = inject(CookieService);
   protected localStorageService = inject(LocalStorageService);
 
   public httpPostRequest<T, U>(
     url: string,
     body: T,
-    params: Params = {},
+    requestOptions?: {
+      params?: Params;
+      noHeaders?: boolean;
+    },
   ): Observable<U> {
-    const headers = this.getHttpHeaders();
+    const {
+      params = {},
+      noHeaders = false,
+    } = requestOptions || {};
+
+    const headers = this.getHttpHeaders(noHeaders);
 
     return this.http.post<U>(url, body, {
       headers,
@@ -27,8 +33,17 @@ export class AbstractHttp {
   public httpGetRequest<T>(
     url: string,
     params: Params = {},
+    noHeaders = false,
+    preventCache = false,
   ): Observable<T> {
-    const headers = this.getHttpHeaders();
+    let headers = this.getHttpHeaders(noHeaders);
+
+    if (preventCache) {
+      headers = headers
+        .set('Cache-Control', 'no-cache')
+        .set('Pragma', 'no-cache')
+        .set('Expires', '0');
+    }
 
     return this.http.get<T>(url, { headers, params });
   }
@@ -37,7 +52,7 @@ export class AbstractHttp {
     url: string,
     params: Params = {},
   ): Observable<T> {
-    const headers = this.getHttpHeaders();
+    const headers = this.getHttpHeaders(false);
 
     return this.http.delete<T>(url, { headers, params });
   }
@@ -47,7 +62,7 @@ export class AbstractHttp {
     body: U,
     params: Params = {},
   ): Observable<T> {
-    const headers = this.getHttpHeaders();
+    const headers = this.getHttpHeaders(false);
 
     return this.http.patch<T>(url, body, {
       headers,
@@ -55,20 +70,17 @@ export class AbstractHttp {
     });
   }
 
-  public getHttpHeaders(): HttpHeaders {
-    return new HttpHeaders()
+  public getHttpHeaders(noHeaders: boolean): HttpHeaders {
+    return noHeaders
+      ? new HttpHeaders()
+      : new HttpHeaders()
           .set(
             'Authorization',
-            `JWT ${
+            `Bearer ${
               this.localStorageService.getItem(
                 ELocalStoragesKeys.AccessToken,
               ) || ''
             }`,
-          )
-          .set('X-CSRFToken', this.getCookie('csrftoken'));
-  }
-
-  public getCookie(key: string): string {
-    return this.cookieService.get(key);
+          );
   }
 }

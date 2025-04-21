@@ -1,4 +1,4 @@
 export enum ELocalStoragesKeys {
-  AccessToken = 'access-token',
+  AccessToken = 'access_token',
   Role = 'role',
 }

@@ -5,8 +5,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { AuthService } from '@core/services';
+import { AuthService, LocalStorageService, SnackBarService } from '@core/services';
 import { take } from 'rxjs';
+import { LoginSuccessModel } from '@core/models';
+import { EMessageTypes } from '@core/enums';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -30,6 +33,9 @@ export class LoginComponent implements OnInit {
   constructor(
     private authFormService: AuthFormService,
     private authService: AuthService,
+    private localStorageService: LocalStorageService,
+    private snackBar: SnackBarService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +52,16 @@ export class LoginComponent implements OnInit {
   }
 
   public login(): void {
-    this.authService.login(this.loginForm.getRawValue()).pipe(take(1)).subscribe();
+    this.authService.login(this.loginForm.getRawValue()).pipe(take(1)).subscribe(
+      (res: LoginSuccessModel) => {
+        this.localStorageService.setAccessToken(res.access_token);
+        this.router.navigate(['/']);
+      },
+      (error) => {
+        if (error) {
+          this.snackBar.openSnackBar('Invalid email or password', EMessageTypes.Error);
+        }
+      },
+    );
   }
 }
